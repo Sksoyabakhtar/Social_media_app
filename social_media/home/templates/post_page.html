@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        .button-container {
+            text-align: right;
+            margin-top: 20px;
+            margin-right: 20px;
+        }
+
+        .button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none; /* Remove underline from buttons */
+        }
+
+        .button.logout {
+            background-color: #e74c3c;
+        }
+
+        section {
+            margin: 20px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        h2 {
+            font-size: 20px;
+        }
+
+        /* Style your post cards here */
+        .post-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Style the edit and delete buttons */
+        .edit-button {
+            background-color: #28a745; /* Green color for edit button */
+        }
+
+        .delete-button {
+            background-color: #dc3545; /* Red color for delete button */
+        }
+
+        .edit-button,
+        .delete-button {
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .edit-button:hover,
+        .delete-button:hover {
+            opacity: 0.8;
+        }
+
+        /* Style the post creation form */
+        .post-form {
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        .post-form label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .post-form input[type="text"],
+        .post-form textarea,
+        .post-form select,
+        .post-form input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .post-form button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .post-form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Social Media</h1>
+    </header>
+
+    <!-- Button container -->
+    <div class="button-container">
+        <a class="button" href="{% url 'home' %}">Home</a>
+        <a class="button" href="{% url 'post_page' %}">Post</a>
+        <a class="button" href="{% url 'user_profile' %}">Profile</a>
+        <a class="button logout" href="{% url 'logout' %}">Logout</a>
+    </div>
+    
+    <section class="container mt-3">
+        <h2>Your Posts</h2>
+        <div class="row">
+            <!-- Loop through user's posts -->
+            {% for post in user_posts %}
+                <div class="col-md-4">
+                    <div class="card post-card">
+                        <div class="card-body">
+                            <h3 class="card-title">{{ post.post_name }}</h3>
+                            <p class="card-text">{{ post.post_description }}</p>
+                            <img src="{{ post.post_image.url }}" alt="Post Image" class="img-fluid">
+                            <p>Category: {{ post.category }}</p>
+                            <p>Posted on: {{ post.timestamp }}</p>
+                        </div>
+                        <div class="card-footer">
+                            <!-- Edit and delete buttons with CSS styles -->
+                            <div class="button-container">
+                                <a href="{% url 'edit_post' post.id %}" class="button edit-button">Edit</a>
+                                <a href="{% url 'delete_post' post.id %}" class="button delete-button">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="container mt-3">
+        <h2>Create a New Post</h2>
+        <!-- Post creation form -->
+        <form class="post-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="post_name">Post Name:</label>
+            <input type="text" id="post_name" name="post_name" required>
+            <label for="post_description">Post Description:</label>
+            <textarea id="post_description" name="post_description" rows="4" required></textarea>
+            <label for="post_image">Post Image:</label>
+            <input type="file" id="post_image" name="post_image" accept="image/*" required>
+            <label for="category">Category:</label>
+            <select id="category" name="category" required>
+                <option value="cricket">Cricket</option>
+                <option value="social">Social</option>
+                <option value="science">Science</option>
+                <option value="article">Article</option>
+                <option value="art">Art</option>
+                <option value="news">News</option>
+            </select>
+            <button type="submit">Post</button>
+        </form>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

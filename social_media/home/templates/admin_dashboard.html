@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        /* Reset some default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body style */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        /* Header style */
+        header {
+            background-color: #333;
+            text-align: center;
+            padding: 0;
+        }
+
+        /* Updated styles for h1 element within the header */
+        header h1 {
+            font-size: 22px;
+            margin: 0;
+            padding: 18px 0; /* Add padding here */
+            background-color: #333;
+            color: #fff;
+        }
+
+        /* Container style */
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 10.0px;
+            /* background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+        }
+
+        /* Table style */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Link style */
+        a {
+            text-decoration: none;
+            color: #007bff;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+
+        /* Logout button style */
+        .logout-button {
+            display: inline-block;
+            background-color: #d9534f;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .logout-button:hover {
+            background-color: #c9302c;
+        }
+
+        /* Log out link style */
+        .logout-link {
+            float: right;
+            margin-top: -30px;
+        }
+
+        /* Style for action buttons */
+        .action-button {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-right: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        /* Style for the Delete button */
+        .delete-button {
+            background-color: #d9534f;
+            color: #fff;
+        }
+
+        /* Style for the Deactivate button */
+        .deactivate-button {
+            background-color: #f0ad4e;
+            color: #fff;
+        }
+
+        /* Style for the Activate button */
+        .activate-button {
+            background-color: #5bc0de;
+            color: #fff;
+        }
+
+        /* Add more styles as needed */
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Admin Dashboard</h1>
+            <!-- Log out link -->
+        </div>
+    </header>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{% if user.is_active %}Active{% else %}Inactive{% endif %}</td>
+                    <td>
+                        <a class="action-button delete-button" href="{% url 'delete_user' user.id %}">Delete</a>
+                        {% if user.is_active %}
+                            <a class="action-button deactivate-button" href="{% url 'deactivate_user' user.id %}">Deactivate</a>
+                        {% else %}
+                            <a class="action-button activate-button" href="{% url 'activate_user' user_id=user.id %}">Activate</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Logout button -->
+        <a class="logout-button" href="{% url 'admin_login' %}">Logout</a>
+    </div>
+</body>
+</html>

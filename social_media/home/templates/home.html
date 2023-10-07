@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        .button-container {
+            text-align: right;
+            margin-top: 20px;
+            margin-right: 20px;
+        }
+
+        .button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none; /* Remove underline from buttons */
+        }
+
+        .button.logout {
+            background-color: #e74c3c;
+        }
+
+        section {
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        h2 {
+            font-size: 20px;
+        }
+
+        /* Style your post cards here */
+        .post-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+
+        /* Hide comments by default */
+        .comments {
+            display: none;
+        }
+
+        /* Style comments section */
+        .comments h3 {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .comment {
+            border: 1px solid #ddd;
+            padding: 5px;
+            margin-top: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            padding: 5px;
+            margin-top: 10px;
+        }
+
+        /* Styles for comment buttons */
+        .comment-actions {
+            margin-top: 10px;
+        }
+
+        .edit-comment,
+        .delete-comment {
+            color: #007bff;
+            margin-right: 10px;
+            text-decoration: none;
+        }
+
+        .edit-comment:hover,
+        .delete-comment:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Social Media</h1>
+    </header>
+
+    <!-- Button container -->
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-md-3">
+                <a class="btn btn-primary btn-block" href="{% url 'home' %}">Home</a>
+            </div>
+            <div class="col-md-3">
+                <a class="btn btn-primary btn-block" href="{% url 'post_page' %}">Post</a>
+            </div>
+            <div class="col-md-3">
+                <a class="btn btn-primary btn-block" href="{% url 'user_profile' %}">Profile</a>
+            </div>
+            <div class="col-md-3">
+                <a class="btn btn-danger btn-block" href="{% url 'logout' %}">Logout</a>
+            </div>
+        </div>
+    </div>
+    
+    <section class="container mt-3">
+        <h2>Recent Posts</h2>
+        <div class="row">
+            <!-- Loop through recent_posts -->
+            {% for post in recent_posts %}
+                <div class="col-md-4">
+                    <div class="post-card">
+                        <h2>Name: {{ post.post_name }}</h2>
+                        <p>Category: {{ post.category }}</p>
+                        <p>Posted by: {{ post.user.username }}</p> <!-- Display the username of the post's user -->
+                        <img src="{{ post.post_image.url }}" alt="Post Image" class="img-fluid">
+                        <p>Description: {{ post.post_description }}</p>
+                        <p>Posted on: {{ post.timestamp }}</p>
+            
+                        <!-- Comments Section Toggle Button -->
+                        <button class="comment-toggle btn btn-primary" data-post-id="{{ post.id }}">Add a comment</button>
+            
+                        <!-- Comments Section -->
+                        <div class="comments" id="comments-{{ post.id }}">
+                            <h3>Comments:</h3>
+                            {% for comment in post.comment_set.all %}
+                                <div class="comment">
+                                    <p>{{ comment.text }}</p>
+                                    <p>Posted by: {{ comment.user.username }}</p>
+                                    {% if comment.user == user %}
+                                        <div class="comment-actions">
+                                            <a class="edit-comment" href="{% url 'edit_comment' comment.id %}">Edit</a>
+                                            <a class="delete-comment" href="{% url 'delete_comment' comment.id %}">Delete</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+            
+                            <!-- Form to add a new comment -->
+                            <form class="comment-form" data-post-id="{{ post.id }}">
+                                {% csrf_token %}
+                                <textarea name="text" rows="4" class="form-control" placeholder="Add a comment"></textarea>
+                                <br>
+                                <input type="submit" value="Post Comment" class="btn btn-primary">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // JavaScript to toggle comments section visibility
+        const commentToggleButtons = document.querySelectorAll('.comment-toggle');
+        commentToggleButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const postId = this.getAttribute('data-post-id');
+                const commentsSection = document.getElementById(`comments-${postId}`);
+                commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+
+        // JavaScript to handle comment form submission
+        const commentForms = document.querySelectorAll('.comment-form');
+        commentForms.forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const postId = this.getAttribute('data-post-id');
+                const formData = new FormData(this);
+
+                // Make an AJAX request to add the comment
+                fetch("{% url 'add_comment' 0 %}".replace('0', postId), {
+                    method: 'POST', // Use POST method
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Update the comments section with the new comment
+                    const commentsSection = document.getElementById(`comments-${postId}`);
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment';
+                    commentDiv.innerHTML = `
+                        <p>${data.text}</p>
+                        <p>Posted by: ${data.username}</p>
+                    `;
+                    commentsSection.appendChild(commentDiv);
+
+                    // Clear the textarea
+                    this.querySelector('textarea').value = '';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
